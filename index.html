@@ -149,6 +149,41 @@
             background-color: orange;
         }
 
+        /* 凡例スタイル */
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+            background-color: #fff8e1;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid black;
+            display: inline-block;
+        }
+
+        .legend-dot.hit {
+            background-color: red;
+        }
+
+        .legend-dot.blow {
+            background-color: white;
+        }
+
         /* ポップアップスタイル */
         #popup {
             display: none;
@@ -184,6 +219,19 @@
 <body>
     <div id="game-container">
         <h1>ヒットアンドブロー</h1>
+
+        <!-- 凡例 -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-dot hit"></div>
+                <span><strong>赤丸</strong> = Hit（色と位置が正解）</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-dot blow"></div>
+                <span><strong>白丸</strong> = Blow（色のみ正解）</span>
+            </div>
+        </div>
+
         <!-- 解答表示用スロット -->
         <div id="solution">
             <div class="solution-slot"></div>
