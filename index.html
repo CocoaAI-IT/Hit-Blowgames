@@ -1,0 +1,461 @@
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ヒットアンドブロー</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f7f7f7;
+            margin: 0;
+        }
+
+        #game-container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #attempts-container {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .attempt {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slot {
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            border: 2px dashed #ccc;
+            border-radius: 50%;
+            transition: border-color 0.3s, transform 0.3s;
+            cursor: pointer;
+        }
+
+        .highlight {
+            border-color: blue;
+            transform: scale(1.1);
+        }
+
+        .result {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            width: 40px;
+            height: 40px;
+            background-color: #eee;
+            border: 2px solid #ccc;
+            margin-left: 10px;
+            position: relative;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: black;
+            justify-self: center;
+            align-self: center;
+        }
+
+        .ok-button {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            background-color: green;
+            color: white;
+            font-size: 14px;
+            line-height: 40px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        #solution {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .solution-slot {
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            border-radius: 50%;
+            background-color: #eee;
+        }
+
+        #ball-selection {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .ball {
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .ball[data-color="red"] {
+            background-color: red;
+        }
+
+        .ball[data-color="blue"] {
+            background-color: blue;
+        }
+
+        .ball[data-color="green"] {
+            background-color: green;
+        }
+
+        .ball[data-color="yellow"] {
+            background-color: yellow;
+        }
+
+        .ball[data-color="purple"] {
+            background-color: purple;
+        }
+
+        .ball[data-color="orange"] {
+            background-color: orange;
+        }
+
+        /* ポップアップスタイル */
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 100;
+        }
+
+        #popup-message {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        #retry {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <h1>ヒットアンドブロー</h1>
+        <!-- 解答表示用スロット -->
+        <div id="solution">
+            <div class="solution-slot"></div>
+            <div class="solution-slot"></div>
+            <div class="solution-slot"></div>
+            <div class="solution-slot"></div>
+        </div>
+        <div id="attempts-container">
+            <!-- 試行スロットを6回分表示 -->
+            <div class="attempt" data-attempt="5">
+                <div class="slot" data-index="0"></div>
+                <div class="slot" data-index="1"></div>
+                <div class="slot" data-index="2"></div>
+                <div class="slot" data-index="3"></div>
+                <div class="result">
+                    <button class="ok-button">OK</button>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            <div class="attempt" data-attempt="4">
+                <div class="slot" data-index="0"></div>
+                <div class="slot" data-index="1"></div>
+                <div class="slot" data-index="2"></div>
+                <div class="slot" data-index="3"></div>
+                <div class="result">
+                    <button class="ok-button">OK</button>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            <div class="attempt" data-attempt="3">
+                <div class="slot" data-index="0"></div>
+                <div class="slot" data-index="1"></div>
+                <div class="slot" data-index="2"></div>
+                <div class="slot" data-index="3"></div>
+                <div class="result">
+                    <button class="ok-button">OK</button>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            <div class="attempt" data-attempt="2">
+                <div class="slot" data-index="0"></div>
+                <div class="slot" data-index="1"></div>
+                <div class="slot" data-index="2"></div>
+                <div class="slot" data-index="3"></div>
+                <div class="result">
+                    <button class="ok-button">OK</button>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            <div class="attempt" data-attempt="1">
+                <div class="slot" data-index="0"></div>
+                <div class="slot" data-index="1"></div>
+                <div class="slot" data-index="2"></div>
+                <div class="slot" data-index="3"></div>
+                <div class="result">
+                    <button class="ok-button">OK</button>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            <div class="attempt" data-attempt="0">
+                <div class="slot" data-index="0"></div>
+                <div class="slot" data-index="1"></div>
+                <div class="slot" data-index="2"></div>
+                <div class="slot" data-index="3"></div>
+                <div class="result">
+                    <button class="ok-button">OK</button>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+        </div>
+        <div id="ball-selection">
+            <div class="ball" data-color="red"></div>
+            <div class="ball" data-color="blue"></div>
+            <div class="ball" data-color="green"></div>
+            <div class="ball" data-color="yellow"></div>
+            <div class="ball" data-color="purple"></div>
+            <div class="ball" data-color="orange"></div>
+        </div>
+    </div>
+
+    <!-- ポップアップ -->
+    <div id="popup">
+        <div id="popup-message"></div>
+        <button id="retry">再挑戦</button>
+    </div>
+
+    <script>
+        const maxAttempts = 6;
+        let currentAttempt = 0;
+        let currentSlotIndex = 0;
+        let selectedColor = null;
+        const popup = document.getElementById("popup");
+        const popupMessage = document.getElementById("popup-message");
+        const retryButton = document.getElementById("retry");
+        const solutionSlots = document.querySelectorAll(".solution-slot");
+        const solution = Array.from({ length: 4 }, () => getRandomColor());
+
+        document.querySelectorAll(".ball").forEach((ball) => {
+            ball.addEventListener("click", () => {
+                selectedColor = ball.dataset.color;
+                placeBallInSlot(selectedColor);
+            });
+        });
+
+        document.querySelectorAll(".slot").forEach((slot) => {
+            slot.addEventListener("click", () => {
+                const attemptElement = slot.closest(".attempt");
+                if (
+                    attemptElement.dataset.attempt ==
+                    maxAttempts - 1 - currentAttempt
+                ) {
+                    currentSlotIndex = Array.from(
+                        attemptElement.querySelectorAll(".slot")
+                    ).indexOf(slot);
+                    highlightCurrentSlot();
+                }
+            });
+        });
+
+        function highlightCurrentSlot() {
+            const attemptSlots = document.querySelectorAll(
+                `.attempt[data-attempt="${maxAttempts - 1 - currentAttempt}"] .slot`
+            );
+            attemptSlots.forEach((slot, index) => {
+                slot.classList.toggle("highlight", index === currentSlotIndex);
+            });
+        }
+
+        function placeBallInSlot(color) {
+            const attemptSlots = document.querySelectorAll(
+                `.attempt[data-attempt="${maxAttempts - 1 - currentAttempt}"] .slot`
+            );
+            attemptSlots[currentSlotIndex].style.backgroundColor = color;
+            attemptSlots[currentSlotIndex].dataset.color = color;
+            currentSlotIndex = (currentSlotIndex + 1) % 4;
+            highlightCurrentSlot();
+
+            const allFilled = Array.from(attemptSlots).every(
+                (slot) => slot.dataset.color
+            );
+            if (allFilled) {
+                const okButton = document.querySelector(
+                    `.attempt[data-attempt="${maxAttempts - 1 - currentAttempt
+                    }"] .ok-button`
+                );
+                okButton.style.display = "block";
+                okButton.addEventListener("click", handleOkButtonClick);
+            }
+        }
+
+        function handleOkButtonClick(event) {
+            const okButton = event.target;
+            okButton.style.display = "none";
+
+            if (currentAttempt >= maxAttempts) return;
+
+            const attemptSlots = document.querySelectorAll(
+                `.attempt[data-attempt="${maxAttempts - 1 - currentAttempt}"] .slot`
+            );
+            const guess = Array.from(attemptSlots).map(
+                (slot) => slot.dataset.color
+            );
+            if (guess.includes(undefined)) {
+                showPopup("すべてのスロットにボールを配置してください。");
+                return;
+            }
+
+            const { hits, blows } = checkGuess(guess, solution);
+            const resultDisplay = document.querySelector(
+                `.attempt[data-attempt="${maxAttempts - 1 - currentAttempt}"] .result`
+            );
+            updateResultDisplay(resultDisplay, hits, blows);
+
+            attemptSlots.forEach((slot) => {
+                slot.style.transform = "scale(1)";
+                slot.classList.remove("highlight");
+            });
+
+            if (hits === 4) {
+                showPopup("おめでとうございます！正解です！");
+                revealSolution();
+            } else if (++currentAttempt >= maxAttempts) {
+                showPopup("残念ながら不正解です。");
+                revealSolution();
+            }
+
+            currentSlotIndex = 0;
+            highlightCurrentSlot();
+        }
+
+        retryButton.addEventListener("click", () => {
+            location.reload();
+        });
+
+        function getRandomColor() {
+            const colors = ["red", "blue", "green", "yellow", "purple", "orange"];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function checkGuess(guess, solution) {
+            let hits = 0;
+            let blows = 0;
+            const solutionCopy = [...solution];
+
+            guess.forEach((color, index) => {
+                if (color === solution[index]) {
+                    hits++;
+                    solutionCopy[index] = null;
+                }
+            });
+
+            guess.forEach((color, index) => {
+                if (color !== solution[index] && solutionCopy.includes(color)) {
+                    blows++;
+                    solutionCopy[solutionCopy.indexOf(color)] = null;
+                }
+            });
+
+            return { hits, blows };
+        }
+
+        function updateResultDisplay(resultDisplay, hits, blows) {
+            const dots = resultDisplay.querySelectorAll(".dot");
+            dots.forEach((dot, index) => {
+                if (index < hits) {
+                    dot.style.backgroundColor = "red";
+                    dot.style.width = "15px";
+                    dot.style.height = "15px";
+                    dot.style.border = "1px solid black";
+                } else if (index < hits + blows) {
+                    dot.style.backgroundColor = "white";
+                    dot.style.width = "15px";
+                    dot.style.height = "15px";
+                    dot.style.border = "1px solid black";
+                } else {
+                    dot.style.backgroundColor = "black";
+                    dot.style.width = "12px";
+                    dot.style.height = "12px";
+                    dot.style.border = "none";
+                }
+            });
+        }
+
+        function revealSolution() {
+            solution.forEach((color, index) => {
+                solutionSlots[index].style.backgroundColor = color;
+            });
+        }
+
+        function showPopup(message) {
+            popupMessage.textContent = message;
+            popup.style.display = "block";
+        }
+    </script>
+</body>
+
+</html>
