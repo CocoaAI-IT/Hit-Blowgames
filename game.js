@@ -2,13 +2,20 @@
 // ゲーム設定と状態管理
 // ========================================
 
+const LEVEL_CONFIG = {
+    1: { slots: 4, attempts: 8, name: "レベル1" },
+    2: { slots: 5, attempts: 10, name: "レベル2" },
+    3: { slots: 6, attempts: 12, name: "レベル3" }
+};
+
 const GAME_CONFIG = {
-    MAX_ATTEMPTS: 6,
-    SLOT_COUNT: 4,
     COLORS: ["red", "blue", "green", "yellow", "purple", "orange"]
 };
 
 const gameState = {
+    currentLevel: 1,
+    maxAttempts: 8,
+    slotCount: 4,
     currentAttempt: 0,
     currentSlotIndex: 0,
     selectedColor: null,
@@ -29,10 +36,11 @@ function getRandomColor() {
 
 /**
  * 解答を生成
+ * @param {number} slotCount - スロット数
  * @returns {string[]} ランダムな色の配列
  */
-function generateSolution() {
-    return Array.from({ length: GAME_CONFIG.SLOT_COUNT }, () => getRandomColor());
+function generateSolution(slotCount) {
+    return Array.from({ length: slotCount }, () => getRandomColor());
 }
 
 /**
@@ -72,12 +80,128 @@ function checkGuess(guess, solution) {
  * @returns {{isComplete: boolean, isSuccess: boolean}} ゲーム終了状態
  */
 function isGameComplete(hits, currentAttempt) {
-    const isSuccess = hits === GAME_CONFIG.SLOT_COUNT;
-    const isMaxAttempts = currentAttempt >= GAME_CONFIG.MAX_ATTEMPTS - 1;
+    const isSuccess = hits === gameState.slotCount;
+    const isMaxAttempts = currentAttempt >= gameState.maxAttempts - 1;
     return {
         isComplete: isSuccess || isMaxAttempts,
         isSuccess: isSuccess
     };
+}
+
+// ========================================
+// 画面遷移
+// ========================================
+
+/**
+ * ホーム画面を表示
+ */
+function showHomeScreen() {
+    document.getElementById("home-screen").style.display = "flex";
+    document.getElementById("game-container").style.display = "none";
+}
+
+/**
+ * ゲーム画面を表示
+ */
+function showGameScreen() {
+    document.getElementById("home-screen").style.display = "none";
+    document.getElementById("game-container").style.display = "flex";
+}
+
+// ========================================
+// 動的DOM生成
+// ========================================
+
+/**
+ * 試行スロットのHTMLを生成
+ * @param {number} attemptIndex - 試行インデックス
+ * @param {number} slotCount - スロット数
+ * @returns {string} HTML文字列
+ */
+function createAttemptHTML(attemptIndex, slotCount) {
+    const slots = Array.from({ length: slotCount }, (_, i) =>
+        `<div class="slot" data-index="${i}"></div>`
+    ).join('');
+
+    const dots = Array.from({ length: slotCount }, () =>
+        `<div class="dot"></div>`
+    ).join('');
+
+    return `
+        <div class="attempt" data-attempt="${attemptIndex}">
+            ${slots}
+            <div class="result">
+                <button class="ok-button">OK</button>
+                ${dots}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * ゲーム画面を構築
+ * @param {number} level - レベル
+ */
+function buildGameScreen(level) {
+    const config = LEVEL_CONFIG[level];
+    gameState.currentLevel = level;
+    gameState.maxAttempts = config.attempts;
+    gameState.slotCount = config.slots;
+
+    // レベル表示を更新
+    document.getElementById("current-level").textContent = `- ${config.name}`;
+
+    // 解答スロットを生成
+    const solutionContainer = document.getElementById("solution");
+    solutionContainer.innerHTML = Array.from({ length: config.slots }, () =>
+        '<div class="solution-slot"></div>'
+    ).join('');
+
+    // 試行スロットを生成
+    const attemptsContainer = document.getElementById("attempts-container");
+    const attemptsHTML = Array.from({ length: config.attempts }, (_, i) =>
+        createAttemptHTML(config.attempts - 1 - i, config.slots)
+    ).join('');
+    attemptsContainer.innerHTML = attemptsHTML;
+
+    // 結果表示のグリッドを調整
+    adjustResultGrid(config.slots);
+}
+
+/**
+ * 結果表示のグリッドを調整
+ * @param {number} slotCount - スロット数
+ */
+function adjustResultGrid(slotCount) {
+    const style = document.createElement('style');
+    style.id = 'dynamic-result-style';
+
+    // 既存のスタイルを削除
+    const existingStyle = document.getElementById('dynamic-result-style');
+    if (existingStyle) {
+        existingStyle.remove();
+    }
+
+    // スロット数に応じてグリッドを調整
+    let gridTemplate;
+    if (slotCount === 4) {
+        gridTemplate = 'repeat(2, 1fr)';
+    } else if (slotCount === 5) {
+        gridTemplate = 'repeat(3, 1fr)';
+    } else if (slotCount === 6) {
+        gridTemplate = 'repeat(3, 1fr)';
+    }
+
+    style.textContent = `
+        .result {
+            display: grid;
+            grid-template-columns: ${gridTemplate};
+            grid-template-rows: ${gridTemplate};
+            width: ${slotCount === 4 ? '40px' : slotCount === 5 ? '60px' : '60px'};
+            height: ${slotCount === 4 ? '40px' : slotCount === 5 ? '60px' : '60px'};
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // ========================================
@@ -106,7 +230,7 @@ function placeBallInSlot(color) {
     currentSlot.dataset.color = color;
 
     // 次のスロットに移動
-    gameState.currentSlotIndex = (gameState.currentSlotIndex + 1) % GAME_CONFIG.SLOT_COUNT;
+    gameState.currentSlotIndex = (gameState.currentSlotIndex + 1) % gameState.slotCount;
     highlightCurrentSlot();
 
     // すべてのスロットが埋まったらOKボタンを表示
@@ -164,12 +288,28 @@ function revealSolution() {
 /**
  * ポップアップを表示
  * @param {string} message - 表示するメッセージ
+ * @param {boolean} isSuccess - 成功したかどうか
  */
-function showPopup(message) {
+function showPopup(message, isSuccess = false) {
     const popup = document.getElementById("popup");
     const popupMessage = document.getElementById("popup-message");
+    const popupIcon = document.getElementById("popup-icon");
+
     popupMessage.textContent = message;
+
+    // アイコンを設定
+    if (isSuccess) {
+        popupIcon.innerHTML = '<i data-lucide="trophy" style="color: #ffd700; width: 80px; height: 80px;"></i>';
+    } else {
+        popupIcon.innerHTML = '<i data-lucide="x-circle" style="color: #dc3545; width: 80px; height: 80px;"></i>';
+    }
+
     popup.style.display = "block";
+
+    // Lucideアイコンを初期化
+    if (window.lucide) {
+        lucide.createIcons();
+    }
 }
 
 /**
@@ -213,7 +353,7 @@ function resetSlotHighlight(attemptIndex) {
  * @returns {NodeListOf<Element>} スロット要素のリスト
  */
 function getAttemptSlots(attemptIndex) {
-    const dataAttempt = GAME_CONFIG.MAX_ATTEMPTS - 1 - attemptIndex;
+    const dataAttempt = gameState.maxAttempts - 1 - attemptIndex;
     return document.querySelectorAll(`.attempt[data-attempt="${dataAttempt}"] .slot`);
 }
 
@@ -223,7 +363,7 @@ function getAttemptSlots(attemptIndex) {
  * @returns {Element} OKボタン要素
  */
 function getOkButton(attemptIndex) {
-    const dataAttempt = GAME_CONFIG.MAX_ATTEMPTS - 1 - attemptIndex;
+    const dataAttempt = gameState.maxAttempts - 1 - attemptIndex;
     return document.querySelector(`.attempt[data-attempt="${dataAttempt}"] .ok-button`);
 }
 
@@ -233,7 +373,7 @@ function getOkButton(attemptIndex) {
  * @returns {Element} 結果表示要素
  */
 function getResultDisplay(attemptIndex) {
-    const dataAttempt = GAME_CONFIG.MAX_ATTEMPTS - 1 - attemptIndex;
+    const dataAttempt = gameState.maxAttempts - 1 - attemptIndex;
     return document.querySelector(`.attempt[data-attempt="${dataAttempt}"] .result`);
 }
 
@@ -251,11 +391,25 @@ function isAttemptComplete(attemptSlots) {
 // ========================================
 
 /**
+ * レベル選択時のハンドラー
+ * @param {Event} event - クリックイベント
+ */
+function handleLevelSelect(event) {
+    const levelCard = event.target.closest('.level-card');
+    if (!levelCard) return;
+
+    const level = parseInt(levelCard.dataset.level);
+    startGame(level);
+}
+
+/**
  * ボール選択時のハンドラー
  * @param {Event} event - クリックイベント
  */
 function handleBallClick(event) {
     const ball = event.target;
+    if (!ball.classList.contains('ball')) return;
+
     gameState.selectedColor = ball.dataset.color;
     placeBallInSlot(gameState.selectedColor);
 }
@@ -266,11 +420,13 @@ function handleBallClick(event) {
  */
 function handleSlotClick(event) {
     const slot = event.target;
+    if (!slot.classList.contains('slot')) return;
+
     const attemptElement = slot.closest(".attempt");
     const dataAttempt = parseInt(attemptElement.dataset.attempt);
 
     // 現在の試行のみクリック可能
-    if (dataAttempt === GAME_CONFIG.MAX_ATTEMPTS - 1 - gameState.currentAttempt) {
+    if (dataAttempt === gameState.maxAttempts - 1 - gameState.currentAttempt) {
         const attemptSlots = attemptElement.querySelectorAll(".slot");
         gameState.currentSlotIndex = Array.from(attemptSlots).indexOf(slot);
         highlightCurrentSlot();
@@ -285,7 +441,7 @@ function handleOkButtonClick(event) {
     hideOkButton(gameState.currentAttempt);
 
     // 最大試行回数チェック
-    if (gameState.currentAttempt >= GAME_CONFIG.MAX_ATTEMPTS) {
+    if (gameState.currentAttempt >= gameState.maxAttempts) {
         return;
     }
 
@@ -295,7 +451,7 @@ function handleOkButtonClick(event) {
 
     // 未入力チェック
     if (guess.includes(undefined)) {
-        showPopup("すべてのスロットにボールを配置してください。");
+        showPopup("すべてのスロットにボールを配置してください。", false);
         return;
     }
 
@@ -311,9 +467,9 @@ function handleOkButtonClick(event) {
     const gameResult = isGameComplete(hits, gameState.currentAttempt);
     if (gameResult.isComplete) {
         if (gameResult.isSuccess) {
-            showPopup("おめでとうございます！正解です！");
+            showPopup("おめでとうございます！\n正解です！", true);
         } else {
-            showPopup("残念ながら不正解です。");
+            showPopup("残念！\nまたチャレンジしてね！", false);
         }
         revealSolution();
     } else {
@@ -328,48 +484,108 @@ function handleOkButtonClick(event) {
  * リトライボタンクリック時のハンドラー
  */
 function handleRetryClick() {
-    location.reload();
-}
-
-// ========================================
-// 初期化
-// ========================================
-
-/**
- * イベントリスナーを設定
- */
-function setupEventListeners() {
-    // ボール選択
-    document.querySelectorAll(".ball").forEach((ball) => {
-        ball.addEventListener("click", handleBallClick);
-    });
-
-    // スロットクリック
-    document.querySelectorAll(".slot").forEach((slot) => {
-        slot.addEventListener("click", handleSlotClick);
-    });
-
-    // リトライボタン
-    const retryButton = document.getElementById("retry");
-    retryButton.addEventListener("click", handleRetryClick);
+    const popup = document.getElementById("popup");
+    popup.style.display = "none";
+    startGame(gameState.currentLevel);
 }
 
 /**
- * ゲームを初期化して開始
+ * ホームボタンクリック時のハンドラー
  */
-function initGame() {
-    gameState.solution = generateSolution();
+function handleHomeClick() {
+    const popup = document.getElementById("popup");
+    popup.style.display = "none";
+    showHomeScreen();
+}
+
+// ========================================
+// ゲーム開始・初期化
+// ========================================
+
+/**
+ * ゲームを開始
+ * @param {number} level - レベル
+ */
+function startGame(level) {
+    // ゲーム画面を構築
+    buildGameScreen(level);
+
+    // ゲーム状態をリセット
     gameState.currentAttempt = 0;
     gameState.currentSlotIndex = 0;
     gameState.selectedColor = null;
+    gameState.solution = generateSolution(gameState.slotCount);
 
-    setupEventListeners();
+    // イベントリスナーを再設定
+    setupGameEventListeners();
+
+    // ゲーム画面を表示
+    showGameScreen();
+
+    // 初期ハイライト
     highlightCurrentSlot();
+
+    // Lucideアイコンを初期化
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}
+
+/**
+ * ゲーム用イベントリスナーを設定
+ */
+function setupGameEventListeners() {
+    // ボール選択（イベント委譲）
+    const ballSelection = document.getElementById("ball-selection");
+    ballSelection.removeEventListener("click", handleBallClick);
+    ballSelection.addEventListener("click", handleBallClick);
+
+    // スロットクリック（イベント委譲）
+    const attemptsContainer = document.getElementById("attempts-container");
+    attemptsContainer.removeEventListener("click", handleSlotClick);
+    attemptsContainer.addEventListener("click", handleSlotClick);
+}
+
+/**
+ * アプリケーション全体の初期化
+ */
+function initApp() {
+    // レベル選択（イベント委譲）
+    const levelCards = document.querySelector('.level-cards');
+    if (levelCards) {
+        levelCards.addEventListener("click", handleLevelSelect);
+    }
+
+    // リトライボタン
+    const retryButton = document.getElementById("retry");
+    if (retryButton) {
+        retryButton.addEventListener("click", handleRetryClick);
+    }
+
+    // ホームボタン
+    const homeButton = document.getElementById("home-button");
+    if (homeButton) {
+        homeButton.addEventListener("click", handleHomeClick);
+    }
+
+    // 戻るボタン
+    const backButton = document.getElementById("back-to-home");
+    if (backButton) {
+        backButton.addEventListener("click", handleHomeClick);
+    }
+
+    // ホーム画面を表示
+    showHomeScreen();
+
+    // Lucideアイコンを初期化
+    if (window.lucide) {
+        lucide.createIcons();
+    }
 }
 
 // ========================================
 // アプリケーション起動
 // ========================================
 
-// DOMの読み込みが完了したらゲームを初期化
-document.addEventListener("DOMContentLoaded", initGame);
+// DOMの読み込みが完了したらアプリケーションを初期化
+document.addEventListener("DOMContentLoaded", initApp);
