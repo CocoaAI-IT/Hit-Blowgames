@@ -1,0 +1,208 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f7f7f7;
+    margin: 0;
+}
+
+#game-container {
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+#attempts-container {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.attempt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.slot {
+    width: 40px;
+    height: 40px;
+    margin: 0 5px;
+    border: 2px dashed #ccc;
+    border-radius: 50%;
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: pointer;
+}
+
+.highlight {
+    border-color: blue;
+    transform: scale(1.1);
+}
+
+.result {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    width: 40px;
+    height: 40px;
+    background-color: #eee;
+    border: 2px solid #ccc;
+    margin-left: 10px;
+    position: relative;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: black;
+    justify-self: center;
+    align-self: center;
+}
+
+.ok-button {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    background-color: green;
+    color: white;
+    font-size: 14px;
+    line-height: 40px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+}
+
+#solution {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.solution-slot {
+    width: 40px;
+    height: 40px;
+    margin: 0 5px;
+    border-radius: 50%;
+    background-color: #eee;
+}
+
+#ball-selection {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.ball {
+    width: 40px;
+    height: 40px;
+    margin: 0 5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.ball[data-color="red"] {
+    background-color: red;
+}
+
+.ball[data-color="blue"] {
+    background-color: blue;
+}
+
+.ball[data-color="green"] {
+    background-color: green;
+}
+
+.ball[data-color="yellow"] {
+    background-color: yellow;
+}
+
+.ball[data-color="purple"] {
+    background-color: purple;
+}
+
+.ball[data-color="orange"] {
+    background-color: orange;
+}
+
+/* 凡例スタイル */
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 12px 20px;
+    background-color: #fff8e1;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid black;
+    display: inline-block;
+}
+
+.legend-dot.hit {
+    background-color: red;
+}
+
+.legend-dot.blow {
+    background-color: white;
+}
+
+/* ポップアップスタイル */
+#popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    z-index: 100;
+}
+
+#popup-message {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+#retry {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+}
