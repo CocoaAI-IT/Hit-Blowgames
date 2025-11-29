@@ -5,11 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ヒットアンドブロー</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-    <div id="game-container">
-        <h1>ヒットアンドブロー</h1>
+    <!-- ホーム画面 -->
+    <div id="home-screen">
+        <div class="home-content">
+            <h1 class="home-title">
+                <i data-lucide="target"></i>
+                ヒット＆ブロー
+            </h1>
+            <p class="home-description">色と位置を当てる推理ゲーム</p>
+
+            <div class="level-selection">
+                <h2>レベルを選択してください</h2>
+                <div class="level-cards">
+                    <button class="level-card" data-level="1">
+                        <div class="level-icon">
+                            <i data-lucide="star"></i>
+                        </div>
+                        <h3>レベル1</h3>
+                        <p class="level-desc">4つのスロット</p>
+                        <p class="level-info">初心者向け</p>
+                    </button>
+                    <button class="level-card" data-level="2">
+                        <div class="level-icon">
+                            <i data-lucide="zap"></i>
+                        </div>
+                        <h3>レベル2</h3>
+                        <p class="level-desc">5つのスロット</p>
+                        <p class="level-info">中級者向け</p>
+                    </button>
+                    <button class="level-card" data-level="3">
+                        <div class="level-icon">
+                            <i data-lucide="flame"></i>
+                        </div>
+                        <h3>レベル3</h3>
+                        <p class="level-desc">6つのスロット</p>
+                        <p class="level-info">上級者向け</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲーム画面 -->
+    <div id="game-container" style="display: none;">
+        <button id="back-to-home" class="back-button">
+            <i data-lucide="arrow-left"></i>
+            ホームに戻る
+        </button>
+        <h1>ヒットアンドブロー <span id="current-level"></span></h1>
 
         <!-- 凡例 -->
         <div class="legend">
@@ -123,8 +170,18 @@
 
     <!-- ポップアップ -->
     <div id="popup">
+        <div id="popup-icon"></div>
         <div id="popup-message"></div>
-        <button id="retry">再挑戦</button>
+        <div class="popup-buttons">
+            <button id="home-button" class="popup-btn home-btn">
+                <i data-lucide="home"></i>
+                ホームへ戻る
+            </button>
+            <button id="retry" class="popup-btn retry-btn">
+                <i data-lucide="refresh-cw"></i>
+                もう一度
+            </button>
+        </div>
     </div>
 
     <script src="game.js"></script>

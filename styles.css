@@ -185,24 +185,212 @@ h1 {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
     text-align: center;
     z-index: 100;
+    min-width: 300px;
+}
+
+#popup-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
 }
 
 #popup-message {
-    margin-bottom: 20px;
-    font-size: 18px;
+    margin-bottom: 25px;
+    font-size: 20px;
+    font-weight: bold;
 }
 
-#retry {
-    padding: 10px 20px;
+.popup-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.popup-btn {
+    padding: 12px 24px;
     font-size: 16px;
     cursor: pointer;
     border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.popup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.home-btn {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.retry-btn {
     background-color: #007bff;
     color: #fff;
-    border-radius: 5px;
+}
+
+/* ホーム画面スタイル */
+#home-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.home-content {
+    text-align: center;
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+}
+
+.home-title {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.home-title i {
+    width: 50px;
+    height: 50px;
+    color: #007bff;
+}
+
+.home-description {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 40px;
+}
+
+.level-selection h2 {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    color: #444;
+}
+
+.level-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.level-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 30px 20px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+}
+
+.level-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.level-card:nth-child(1) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.level-card:nth-child(2) {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.level-card:nth-child(3) {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.level-icon {
+    margin-bottom: 15px;
+}
+
+.level-icon i {
+    width: 48px;
+    height: 48px;
+}
+
+.level-card h3 {
+    font-size: 1.5rem;
+    margin: 10px 0;
+}
+
+.level-desc {
+    font-size: 1rem;
+    margin: 10px 0;
+    opacity: 0.9;
+}
+
+.level-info {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 5px 0 0 0;
+}
+
+/* 戻るボタンスタイル */
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.back-button:hover {
+    background-color: #5a6268;
+}
+
+.back-button i {
+    width: 18px;
+    height: 18px;
+}
+
+#game-container {
+    position: relative;
+}
+
+#current-level {
+    font-size: 0.8em;
+    color: #666;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .home-title {
+        font-size: 2rem;
+    }
+
+    .level-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .back-button {
+        position: static;
+        margin-bottom: 20px;
+    }
 }
