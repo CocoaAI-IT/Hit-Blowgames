@@ -2,10 +2,12 @@ body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start;
+    min-height: 100vh;
     background-color: #f7f7f7;
     margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
 
 #game-container {
@@ -17,6 +19,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -438,11 +444,154 @@ h1 {
 
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
     .home-title {
         font-size: 2rem;
     }
 
     .level-cards {
         grid-template-columns: 1fr;
+    }
+
+    #game-container {
+        padding: 15px;
+        margin: 10px auto;
+        border-radius: 8px;
+    }
+
+    #game-container h1 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .home-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 5px;
+    }
+
+    #current-level {
+        font-size: 0.75em;
+    }
+
+    .legend {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 15px;
+        font-size: 12px;
+    }
+
+    .legend-item {
+        justify-content: flex-start;
+    }
+
+    #attempts-container {
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .attempt {
+        gap: 3px;
+    }
+
+    #ball-selection {
+        margin-top: 15px;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .ball {
+        width: 35px;
+        height: 35px;
+        margin: 2px;
+    }
+
+    .slot {
+        width: 35px;
+        height: 35px;
+        margin: 0 3px;
+    }
+
+    #popup,
+    #confirm-popup {
+        padding: 20px;
+        min-width: 280px;
+        max-width: 90%;
+    }
+
+    #popup-message,
+    #confirm-message {
+        font-size: 16px;
+    }
+
+    .popup-btn,
+    .confirm-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .popup-buttons,
+    .confirm-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .popup-btn,
+    .confirm-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #solution {
+        margin-bottom: 15px;
+    }
+
+    .solution-slot {
+        width: 35px;
+        height: 35px;
+        margin: 0 3px;
+    }
+}
+
+/* 小型スマホ対応 */
+@media (max-width: 480px) {
+    #game-container {
+        padding: 10px;
+        margin: 5px;
+    }
+
+    #game-container h1 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .legend {
+        font-size: 11px;
+        padding: 8px 10px;
+    }
+
+    .ball {
+        width: 30px;
+        height: 30px;
+    }
+
+    .slot {
+        width: 30px;
+        height: 30px;
+        margin: 0 2px;
+    }
+
+    .solution-slot {
+        width: 30px;
+        height: 30px;
+        margin: 0 2px;
+    }
+
+    #attempts-container {
+        gap: 6px;
     }
 }

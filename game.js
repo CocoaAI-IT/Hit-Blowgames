@@ -242,6 +242,35 @@ function adjustResultGrid(slotCount) {
         }
 
         ${dotPositions}
+
+        /* スマホ対応 */
+        @media (max-width: 768px) {
+            .result {
+                width: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '35px'};
+                height: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '52px'};
+            }
+
+            .ok-button {
+                width: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '35px'};
+                height: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '52px'};
+                line-height: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '52px'};
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .result {
+                width: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '30px'};
+                height: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '45px'};
+            }
+
+            .ok-button {
+                width: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '30px'};
+                height: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '45px'};
+                line-height: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '45px'};
+                font-size: 10px;
+            }
+        }
     `;
     document.head.appendChild(style);
 }
