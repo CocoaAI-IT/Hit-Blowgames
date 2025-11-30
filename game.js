@@ -320,11 +320,11 @@ function updateResultDisplay(resultDisplay, hits, blows) {
     const dots = resultDisplay.querySelectorAll(".dot");
     dots.forEach((dot, index) => {
         if (index < hits) {
-            // Hit表示（赤丸）
-            setDotStyle(dot, "red", "15px", "1px solid black");
+            // Hit表示（赤丸）- 黒丸と同じサイズで統一
+            setDotStyle(dot, "red", "12px", "1px solid black");
         } else if (index < hits + blows) {
-            // Blow表示（白丸）
-            setDotStyle(dot, "white", "15px", "1px solid black");
+            // Blow表示（白丸）- 黒丸と同じサイズで統一
+            setDotStyle(dot, "white", "12px", "1px solid black");
         } else {
             // 未使用（黒丸）
             setDotStyle(dot, "black", "12px", "none");
@@ -589,7 +589,7 @@ function handleHomeClick() {
  * ホームアイコンクリック時のハンドラー（ゲーム中）
  */
 function handleHomeIconClick() {
-    showConfirmPopup();
+    showPopup("中断しますか？", false);
 }
 
 /**
