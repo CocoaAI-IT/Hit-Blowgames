@@ -4,8 +4,8 @@
 
 const LEVEL_CONFIG = {
     1: { slots: 4, attempts: 8, name: "レベル1" },
-    2: { slots: 5, attempts: 10, name: "レベル2" },
-    3: { slots: 6, attempts: 12, name: "レベル3" }
+    2: { slots: 5, attempts: 8, name: "レベル2" },
+    3: { slots: 6, attempts: 8, name: "レベル3" }
 };
 
 const GAME_CONFIG = {
@@ -568,10 +568,10 @@ function initApp() {
         homeButton.addEventListener("click", handleHomeClick);
     }
 
-    // 戻るボタン
-    const backButton = document.getElementById("back-to-home");
-    if (backButton) {
-        backButton.addEventListener("click", handleHomeClick);
+    // ホームアイコン
+    const homeIcon = document.getElementById("home-icon");
+    if (homeIcon) {
+        homeIcon.addEventListener("click", handleHomeClick);
     }
 
     // ホーム画面を表示
