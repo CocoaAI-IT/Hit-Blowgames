@@ -182,24 +182,66 @@ function adjustResultGrid(slotCount) {
         existingStyle.remove();
     }
 
-    // スロット数に応じてグリッドを調整
-    let gridTemplate;
+    // スロット数に応じてグリッドとサイズを調整
+    let gridColumns, gridRows, width, height;
+
     if (slotCount === 4) {
-        gridTemplate = 'repeat(2, 1fr)';
+        gridColumns = 'repeat(2, 1fr)';
+        gridRows = 'repeat(2, 1fr)';
+        width = height = '40px';
     } else if (slotCount === 5) {
-        gridTemplate = 'repeat(3, 1fr)';
+        // サイコロの5の配置: 3x3グリッド
+        gridColumns = 'repeat(3, 1fr)';
+        gridRows = 'repeat(3, 1fr)';
+        width = height = '60px';
     } else if (slotCount === 6) {
-        gridTemplate = 'repeat(3, 1fr)';
+        // サイコロの6の配置: 2列3行
+        gridColumns = 'repeat(2, 1fr)';
+        gridRows = 'repeat(3, 1fr)';
+        width = '40px';
+        height = '60px';
+    }
+
+    let dotPositions = '';
+
+    // スロット数に応じたドットの配置を設定
+    if (slotCount === 5) {
+        // サイコロの5: 四隅と中央
+        dotPositions = `
+            .dot:nth-child(2) { grid-area: 1 / 1; }  /* 左上 */
+            .dot:nth-child(3) { grid-area: 1 / 3; }  /* 右上 */
+            .dot:nth-child(4) { grid-area: 2 / 2; }  /* 中央 */
+            .dot:nth-child(5) { grid-area: 3 / 1; }  /* 左下 */
+            .dot:nth-child(6) { grid-area: 3 / 3; }  /* 右下 */
+        `;
+    } else if (slotCount === 6) {
+        // サイコロの6: 左右3つずつ
+        dotPositions = `
+            .dot:nth-child(2) { grid-area: 1 / 1; }  /* 左上 */
+            .dot:nth-child(3) { grid-area: 2 / 1; }  /* 左中 */
+            .dot:nth-child(4) { grid-area: 3 / 1; }  /* 左下 */
+            .dot:nth-child(5) { grid-area: 1 / 2; }  /* 右上 */
+            .dot:nth-child(6) { grid-area: 2 / 2; }  /* 右中 */
+            .dot:nth-child(7) { grid-area: 3 / 2; }  /* 右下 */
+        `;
     }
 
     style.textContent = `
         .result {
             display: grid;
-            grid-template-columns: ${gridTemplate};
-            grid-template-rows: ${gridTemplate};
-            width: ${slotCount === 4 ? '40px' : slotCount === 5 ? '60px' : '60px'};
-            height: ${slotCount === 4 ? '40px' : slotCount === 5 ? '60px' : '60px'};
+            grid-template-columns: ${gridColumns};
+            grid-template-rows: ${gridRows};
+            width: ${width};
+            height: ${height};
         }
+
+        .ok-button {
+            width: ${width};
+            height: ${height};
+            line-height: ${height};
+        }
+
+        ${dotPositions}
     `;
     document.head.appendChild(style);
 }
@@ -310,6 +352,22 @@ function showPopup(message, isSuccess = false) {
     if (window.lucide) {
         lucide.createIcons();
     }
+}
+
+/**
+ * 確認ポップアップを表示
+ */
+function showConfirmPopup() {
+    const confirmPopup = document.getElementById("confirm-popup");
+    confirmPopup.style.display = "block";
+}
+
+/**
+ * 確認ポップアップを非表示
+ */
+function hideConfirmPopup() {
+    const confirmPopup = document.getElementById("confirm-popup");
+    confirmPopup.style.display = "none";
 }
 
 /**
@@ -490,12 +548,34 @@ function handleRetryClick() {
 }
 
 /**
- * ホームボタンクリック時のハンドラー
+ * ホームボタンクリック時のハンドラー（結果ポップアップから）
  */
 function handleHomeClick() {
     const popup = document.getElementById("popup");
     popup.style.display = "none";
     showHomeScreen();
+}
+
+/**
+ * ホームアイコンクリック時のハンドラー（ゲーム中）
+ */
+function handleHomeIconClick() {
+    showConfirmPopup();
+}
+
+/**
+ * 確認ポップアップの「はい」ボタンクリック時のハンドラー
+ */
+function handleConfirmYes() {
+    hideConfirmPopup();
+    showHomeScreen();
+}
+
+/**
+ * 確認ポップアップの「いいえ」ボタンクリック時のハンドラー
+ */
+function handleConfirmNo() {
+    hideConfirmPopup();
 }
 
 // ========================================
@@ -562,16 +642,28 @@ function initApp() {
         retryButton.addEventListener("click", handleRetryClick);
     }
 
-    // ホームボタン
+    // ホームボタン（結果ポップアップから）
     const homeButton = document.getElementById("home-button");
     if (homeButton) {
         homeButton.addEventListener("click", handleHomeClick);
     }
 
-    // ホームアイコン
+    // ホームアイコン（ゲーム中）
     const homeIcon = document.getElementById("home-icon");
     if (homeIcon) {
-        homeIcon.addEventListener("click", handleHomeClick);
+        homeIcon.addEventListener("click", handleHomeIconClick);
+    }
+
+    // 確認ポップアップの「はい」ボタン
+    const confirmYes = document.getElementById("confirm-yes");
+    if (confirmYes) {
+        confirmYes.addEventListener("click", handleConfirmYes);
+    }
+
+    // 確認ポップアップの「いいえ」ボタン
+    const confirmNo = document.getElementById("confirm-no");
+    if (confirmNo) {
+        confirmNo.addEventListener("click", handleConfirmNo);
     }
 
     // ホーム画面を表示

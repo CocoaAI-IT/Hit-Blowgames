@@ -374,6 +374,68 @@ h1 {
     color: #666;
 }
 
+/* 確認ポップアップスタイル */
+#confirm-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    z-index: 101;
+    min-width: 300px;
+}
+
+#confirm-message {
+    margin-bottom: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.confirm-btn {
+    padding: 12px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: bold;
+}
+
+.confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.yes-btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.yes-btn:hover {
+    background-color: #c82333;
+}
+
+.no-btn {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.no-btn:hover {
+    background-color: #5a6268;
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
     .home-title {
