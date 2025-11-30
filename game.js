@@ -384,22 +384,6 @@ function showPopup(message, isSuccess = false) {
 }
 
 /**
- * 確認ポップアップを表示
- */
-function showConfirmPopup() {
-    const confirmPopup = document.getElementById("confirm-popup");
-    confirmPopup.style.display = "block";
-}
-
-/**
- * 確認ポップアップを非表示
- */
-function hideConfirmPopup() {
-    const confirmPopup = document.getElementById("confirm-popup");
-    confirmPopup.style.display = "none";
-}
-
-/**
  * OKボタンを表示
  * @param {number} attemptIndex - 試行インデックス
  */
@@ -586,25 +570,10 @@ function handleHomeClick() {
 }
 
 /**
- * ホームアイコンクリック時のハンドラー（ゲーム中）
+ * ホームに戻るボタンクリック時のハンドラー（ゲーム中）
  */
-function handleHomeIconClick() {
+function handleBackToHome() {
     showPopup("中断しますか？", false);
-}
-
-/**
- * 確認ポップアップの「はい」ボタンクリック時のハンドラー
- */
-function handleConfirmYes() {
-    hideConfirmPopup();
-    showHomeScreen();
-}
-
-/**
- * 確認ポップアップの「いいえ」ボタンクリック時のハンドラー
- */
-function handleConfirmNo() {
-    hideConfirmPopup();
 }
 
 // ========================================
@@ -677,22 +646,10 @@ function initApp() {
         homeButton.addEventListener("click", handleHomeClick);
     }
 
-    // ホームアイコン（ゲーム中）
-    const homeIcon = document.getElementById("home-icon");
-    if (homeIcon) {
-        homeIcon.addEventListener("click", handleHomeIconClick);
-    }
-
-    // 確認ポップアップの「はい」ボタン
-    const confirmYes = document.getElementById("confirm-yes");
-    if (confirmYes) {
-        confirmYes.addEventListener("click", handleConfirmYes);
-    }
-
-    // 確認ポップアップの「いいえ」ボタン
-    const confirmNo = document.getElementById("confirm-no");
-    if (confirmNo) {
-        confirmNo.addEventListener("click", handleConfirmNo);
+    // ホームに戻るボタン（ゲーム中）
+    const backToHomeBtn = document.getElementById("back-to-home");
+    if (backToHomeBtn) {
+        backToHomeBtn.addEventListener("click", handleBackToHome);
     }
 
     // ホーム画面を表示
