@@ -8,8 +8,7 @@ const LEVEL_CONFIG = {
     3: { slots: 6, attempts: 8, name: "レベル3", colorPool: 6, allowDuplicates: true },
     4: { slots: 6, attempts: 8, name: "レベル4", colorPool: 8, allowDuplicates: true },
     5: { slots: 6, attempts: 8, name: "レベル5", colorPool: 10, allowDuplicates: true },
-    6: { slots: 8, attempts: 8, name: "レベル6", colorPool: 10, allowDuplicates: false },
-    7: { slots: 10, attempts: 8, name: "レベル7", colorPool: 10, allowDuplicates: true }
+    6: { slots: 8, attempts: 8, name: "レベル6", colorPool: 10, allowDuplicates: false }
 };
 
 const GAME_CONFIG = {
