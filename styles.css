@@ -348,10 +348,6 @@ h1 {
 }
 
 .level-card:nth-child(6) {
-    background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
-}
-
-.level-card:nth-child(7) {
     background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
 }
 
