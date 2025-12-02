@@ -3,13 +3,17 @@
 // ========================================
 
 const LEVEL_CONFIG = {
-    1: { slots: 4, attempts: 8, name: "レベル1" },
-    2: { slots: 5, attempts: 8, name: "レベル2" },
-    3: { slots: 6, attempts: 8, name: "レベル3" }
+    1: { slots: 4, attempts: 8, name: "レベル1", colorPool: 6, allowDuplicates: true },
+    2: { slots: 5, attempts: 8, name: "レベル2", colorPool: 6, allowDuplicates: true },
+    3: { slots: 6, attempts: 8, name: "レベル3", colorPool: 6, allowDuplicates: true },
+    4: { slots: 6, attempts: 8, name: "レベル4", colorPool: 8, allowDuplicates: true },
+    5: { slots: 6, attempts: 8, name: "レベル5", colorPool: 10, allowDuplicates: true },
+    6: { slots: 8, attempts: 8, name: "レベル6", colorPool: 10, allowDuplicates: false },
+    7: { slots: 10, attempts: 8, name: "レベル7", colorPool: 10, allowDuplicates: true }
 };
 
 const GAME_CONFIG = {
-    COLORS: ["red", "blue", "green", "yellow", "purple", "orange"]
+    COLORS: ["red", "blue", "green", "yellow", "purple", "orange", "pink", "cyan", "lime", "brown"]
 };
 
 const gameState = {
@@ -28,19 +32,30 @@ const gameState = {
 
 /**
  * ランダムな色を取得
+ * @param {number} colorPool - 使用する色の数
  * @returns {string} ランダムに選択された色
  */
-function getRandomColor() {
-    return GAME_CONFIG.COLORS[Math.floor(Math.random() * GAME_CONFIG.COLORS.length)];
+function getRandomColor(colorPool) {
+    return GAME_CONFIG.COLORS[Math.floor(Math.random() * colorPool)];
 }
 
 /**
  * 解答を生成
  * @param {number} slotCount - スロット数
+ * @param {number} colorPool - 使用する色の数
+ * @param {boolean} allowDuplicates - 同色を許可するか
  * @returns {string[]} ランダムな色の配列
  */
-function generateSolution(slotCount) {
-    return Array.from({ length: slotCount }, () => getRandomColor());
+function generateSolution(slotCount, colorPool, allowDuplicates) {
+    if (allowDuplicates) {
+        // 同色あり：ランダムに選択
+        return Array.from({ length: slotCount }, () => getRandomColor(colorPool));
+    } else {
+        // 同色なし：シャッフルして選択
+        const availableColors = GAME_CONFIG.COLORS.slice(0, colorPool);
+        const shuffled = [...availableColors].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, slotCount);
+    }
 }
 
 /**
@@ -164,6 +179,12 @@ function buildGameScreen(level) {
     ).join('');
     attemptsContainer.innerHTML = attemptsHTML;
 
+    // ボール選択を更新
+    const ballSelection = document.getElementById("ball-selection");
+    ballSelection.innerHTML = Array.from({ length: config.colorPool }, (_, i) =>
+        `<div class="ball" data-color="${GAME_CONFIG.COLORS[i]}"></div>`
+    ).join('');
+
     // 結果表示のグリッドを調整
     adjustResultGrid(config.slots);
 }
@@ -200,6 +221,18 @@ function adjustResultGrid(slotCount) {
         gridRows = 'repeat(3, 1fr)';
         width = '40px';
         height = '60px';
+    } else if (slotCount === 8) {
+        // 8スロット: 2列4行
+        gridColumns = 'repeat(2, 1fr)';
+        gridRows = 'repeat(4, 1fr)';
+        width = '40px';
+        height = '80px';
+    } else if (slotCount === 10) {
+        // 10スロット: 2列5行
+        gridColumns = 'repeat(2, 1fr)';
+        gridRows = 'repeat(5, 1fr)';
+        width = '40px';
+        height = '100px';
     }
 
     let dotPositions = '';
@@ -224,6 +257,32 @@ function adjustResultGrid(slotCount) {
             .dot:nth-child(6) { grid-area: 2 / 2; }  /* 右中 */
             .dot:nth-child(7) { grid-area: 3 / 2; }  /* 右下 */
         `;
+    } else if (slotCount === 8) {
+        // 8スロット: 左右4つずつ
+        dotPositions = `
+            .dot:nth-child(2) { grid-area: 1 / 1; }
+            .dot:nth-child(3) { grid-area: 2 / 1; }
+            .dot:nth-child(4) { grid-area: 3 / 1; }
+            .dot:nth-child(5) { grid-area: 4 / 1; }
+            .dot:nth-child(6) { grid-area: 1 / 2; }
+            .dot:nth-child(7) { grid-area: 2 / 2; }
+            .dot:nth-child(8) { grid-area: 3 / 2; }
+            .dot:nth-child(9) { grid-area: 4 / 2; }
+        `;
+    } else if (slotCount === 10) {
+        // 10スロット: 左右5つずつ
+        dotPositions = `
+            .dot:nth-child(2) { grid-area: 1 / 1; }
+            .dot:nth-child(3) { grid-area: 2 / 1; }
+            .dot:nth-child(4) { grid-area: 3 / 1; }
+            .dot:nth-child(5) { grid-area: 4 / 1; }
+            .dot:nth-child(6) { grid-area: 5 / 1; }
+            .dot:nth-child(7) { grid-area: 1 / 2; }
+            .dot:nth-child(8) { grid-area: 2 / 2; }
+            .dot:nth-child(9) { grid-area: 3 / 2; }
+            .dot:nth-child(10) { grid-area: 4 / 2; }
+            .dot:nth-child(11) { grid-area: 5 / 2; }
+        `;
     }
 
     style.textContent = `
@@ -246,28 +305,28 @@ function adjustResultGrid(slotCount) {
         /* スマホ対応 */
         @media (max-width: 768px) {
             .result {
-                width: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '35px'};
-                height: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '52px'};
+                width: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : slotCount === 6 ? '35px' : slotCount === 8 ? '35px' : slotCount === 10 ? '35px' : '35px'};
+                height: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : slotCount === 6 ? '52px' : slotCount === 8 ? '70px' : slotCount === 10 ? '87px' : '52px'};
             }
 
             .ok-button {
-                width: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '35px'};
-                height: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '52px'};
-                line-height: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : '52px'};
+                width: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : slotCount === 6 ? '35px' : slotCount === 8 ? '35px' : slotCount === 10 ? '35px' : '35px'};
+                height: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : slotCount === 6 ? '52px' : slotCount === 8 ? '70px' : slotCount === 10 ? '87px' : '52px'};
+                line-height: ${slotCount === 4 ? '35px' : slotCount === 5 ? '52px' : slotCount === 6 ? '52px' : slotCount === 8 ? '70px' : slotCount === 10 ? '87px' : '52px'};
                 font-size: 12px;
             }
         }
 
         @media (max-width: 480px) {
             .result {
-                width: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '30px'};
-                height: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '45px'};
+                width: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : slotCount === 6 ? '30px' : slotCount === 8 ? '30px' : slotCount === 10 ? '30px' : '30px'};
+                height: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : slotCount === 6 ? '45px' : slotCount === 8 ? '60px' : slotCount === 10 ? '75px' : '45px'};
             }
 
             .ok-button {
-                width: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '30px'};
-                height: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '45px'};
-                line-height: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : '45px'};
+                width: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : slotCount === 6 ? '30px' : slotCount === 8 ? '30px' : slotCount === 10 ? '30px' : '30px'};
+                height: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : slotCount === 6 ? '45px' : slotCount === 8 ? '60px' : slotCount === 10 ? '75px' : '45px'};
+                line-height: ${slotCount === 4 ? '30px' : slotCount === 5 ? '45px' : slotCount === 6 ? '45px' : slotCount === 8 ? '60px' : slotCount === 10 ? '75px' : '45px'};
                 font-size: 10px;
             }
         }
@@ -588,11 +647,14 @@ function startGame(level) {
     // ゲーム画面を構築
     buildGameScreen(level);
 
+    // レベル設定を取得
+    const config = LEVEL_CONFIG[level];
+
     // ゲーム状態をリセット
     gameState.currentAttempt = 0;
     gameState.currentSlotIndex = 0;
     gameState.selectedColor = null;
-    gameState.solution = generateSolution(gameState.slotCount);
+    gameState.solution = generateSolution(config.slots, config.colorPool, config.allowDuplicates);
 
     // イベントリスナーを再設定
     setupGameEventListeners();
